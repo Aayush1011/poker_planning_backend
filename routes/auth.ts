@@ -1,14 +1,10 @@
 import { Router } from "express";
 import { body, param, query } from "express-validator";
 
-import {
-  signup,
-  login,
-  refreshJwt,
-  getUserSessions,
-} from "../controllers/userController";
+import { signup, login, refreshJwt } from "../controllers/authController";
+import { handleValidatorErrors } from "../middlewares/handle-validator-errors";
 
-const userRoutes = Router();
+const authRoutes = Router();
 
 const passwordValidator = () =>
   body("password")
@@ -18,9 +14,9 @@ const passwordValidator = () =>
     .isLength({ min: 5, max: 16 })
     .withMessage("Password has to be between 5 to 16 characters in length");
 
-userRoutes.put("/signup", [passwordValidator()], signup);
+authRoutes.put("/signup", [passwordValidator()], handleValidatorErrors, signup);
 
-userRoutes.post(
+authRoutes.post(
   "/login",
   [
     body("email")
@@ -31,15 +27,10 @@ userRoutes.post(
       .withMessage("Enter a valid email address"),
     passwordValidator(),
   ],
+  handleValidatorErrors,
   login
 );
 
-userRoutes.post("/refresh-jwt", refreshJwt);
+authRoutes.post("/refresh-jwt", refreshJwt);
 
-userRoutes.get(
-  "/:userId/sessions",
-  [param("userId").isInt(), query(["fetchLimit", "fetchOffset"]).isInt()],
-  getUserSessions
-);
-
-export default userRoutes;
+export default authRoutes;

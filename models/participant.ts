@@ -5,13 +5,11 @@ import {
   InferAttributes,
   InferCreationAttributes,
   ForeignKey,
-  EnumDataType,
 } from "sequelize";
-import { UUID } from "crypto";
 
 import sequelize from "../utils/database";
 
-interface ParticipantInterface
+export interface ParticipantInterface
   extends Model<
     InferAttributes<ParticipantInterface>,
     InferCreationAttributes<ParticipantInterface>

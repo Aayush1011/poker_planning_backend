@@ -1,16 +1,11 @@
 import { Router } from "express";
-import { body, param } from "express-validator";
+import { body } from "express-validator";
 
 import { isAuth } from "../middlewares/is-auth";
-import {
-  addParticipant,
-  createSession,
-  getSession,
-} from "../controllers/sessionController";
+import { createSession } from "../controllers/sessionController";
+import { handleValidatorErrors } from "../middlewares/handle-validator-errors";
 
 const sessionRoutes = Router();
-
-sessionRoutes.get("/:sessionId", isAuth, getSession);
 
 sessionRoutes.post(
   "/",
@@ -30,19 +25,9 @@ sessionRoutes.post(
       .isLength({ max: 255, min: 10 })
       .withMessage("Description should be between 10 to 255 characters long"),
   ],
+  handleValidatorErrors,
   isAuth,
   createSession
-);
-
-sessionRoutes.post(
-  "/:sessionId/user/:userId",
-  [
-    param("sessionId").isUUID(),
-    param("userId").isInt(),
-    body("role").trim().toLowerCase().isIn(["moderator", "member"]),
-  ],
-  isAuth,
-  addParticipant
 );
 
 export default sessionRoutes;

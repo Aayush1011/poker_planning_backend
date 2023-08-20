@@ -4,7 +4,7 @@ import jwt, { Secret, JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
 import { CustomError } from "../utils/error";
-import { FINGERPRINT_COOKIE_NAME } from "../controllers/userController";
+import { FINGERPRINT_COOKIE_NAME } from "../controllers/authController";
 import { sha256 } from "../utils/sha256";
 
 export const isAuth = async (

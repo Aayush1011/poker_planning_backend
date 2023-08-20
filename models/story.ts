@@ -18,10 +18,11 @@ interface StoryInterface
     InferCreationAttributes<StoryInterface>
   > {
   id: CreationOptional<number>;
-  sessionId: ForeignKey<UUID>;
+  sessionId: ForeignKey<string>;
+  userId: ForeignKey<number>;
   name: string;
-  description: TextDataType;
-  status: EnumDataType<string>;
+  description: string;
+  status: CreationOptional<EnumDataType<string>>;
   createdAt: CreationOptional<Date>;
   updatedAt: CreationOptional<Date>;
 }
@@ -29,21 +30,26 @@ interface StoryInterface
 const Story = sequelize.define<StoryInterface>("stories", {
   id: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   },
   sessionId: {
-    type: DataTypes.UUID,
+    type: DataTypes.STRING(36),
     allowNull: false,
     field: "session_id",
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: "user_id",
   },
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
   description: {
-    type: DataTypes.TEXT,
+    type: DataTypes.TEXT("medium"),
     allowNull: false,
   },
   status: {

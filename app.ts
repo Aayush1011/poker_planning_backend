@@ -8,9 +8,13 @@ import Story from "./models/story";
 import Participant from "./models/participant";
 import StoryPoint from "./models/story-point";
 import { CustomError } from "./utils/error";
-import userRoutes from "./routes/user";
+import authRoutes from "./routes/auth";
 import sequelize from "./utils/database";
+import sessionsRoutes from "./routes/sessions";
+import usersRoutes from "./routes/users";
 import sessionRoutes from "./routes/session";
+import { io } from "./utils/websocket";
+import { User } from "./models/user";
 
 const app: Application = express();
 
@@ -35,8 +39,10 @@ app.options("/*", (_, res) => {
   res.sendStatus(200);
 });
 
-app.use("/user", userRoutes);
+app.use("/auth", authRoutes);
+app.use("/users", usersRoutes);
 app.use("/session", sessionRoutes);
+app.use("/sessions", sessionsRoutes);
 
 Session.hasMany(Story, {
   sourceKey: "id",
@@ -61,6 +67,11 @@ Session.hasMany(StoryPoint, {
   as: "fk_session_story-points",
 });
 // StoryPoint.belongsTo(Session);
+Participant.hasMany(Story, {
+  sourceKey: "userId",
+  foreignKey: "userId",
+  as: "fk_participant_story",
+});
 Participant.hasMany(StoryPoint, {
   sourceKey: "userId",
   foreignKey: "userId",
@@ -71,6 +82,10 @@ Story.hasMany(StoryPoint, {
   sourceKey: "id",
   foreignKey: "storyId",
   as: "fk_story_story_points",
+});
+Participant.belongsTo(User, {
+  foreignKey: "userId",
+  as: "fk_participant_user",
 });
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
@@ -94,7 +109,9 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 sequelize.sync({ alter: true }).then(() => {
-  app.listen(5000, () => {
+  const server = app.listen(5000, () => {
     console.log("\n\nServer is listening at http://localhost:5000\n\n");
   });
+  io.init(server);
+  io.run();
 });
